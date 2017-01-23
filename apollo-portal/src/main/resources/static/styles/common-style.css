@@ -66,6 +66,10 @@ p, td, span {
     background: #A4A4A4
 }
 
+.label-green-light {
+    background: #31AD51
+}
+
 .panel-default .panel-heading {
     color: #797979;
 }
