@@ -26,8 +26,9 @@ public class DefaultConfigManagerTest extends ComponentTestCase {
 
   @Before
   public void setUp() throws Exception {
+    super.tearDown();//clear the container
     super.setUp();
-    defineComponent(ConfigFactoryManager.class, MockConfigManager.class);
+    defineComponent(ConfigFactoryManager.class, MockConfigFactoryManager.class);
     defaultConfigManager = (DefaultConfigManager) lookup(ConfigManager.class);
     someConfigContent = "someContent";
   }
@@ -83,7 +84,7 @@ public class DefaultConfigManagerTest extends ComponentTestCase {
 
   }
 
-  public static class MockConfigManager implements ConfigFactoryManager {
+  public static class MockConfigFactoryManager implements ConfigFactoryManager {
 
     @Override
     public ConfigFactory getFactory(String namespace) {

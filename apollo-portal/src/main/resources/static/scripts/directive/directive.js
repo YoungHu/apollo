@@ -8,7 +8,6 @@ directive_module.directive('apollonav',
                                    replace: true,
                                    link: function (scope, element, attrs) {
 
-
                                        scope.sourceApps = [];
                                        scope.copyedApps = [];
 
@@ -214,7 +213,7 @@ directive_module.directive('apollorequiredfield', function ($compile, $window) {
 });
 
 /**  确认框 */
-directive_module.directive('apolloconfirmdialog', function ($compile, $window) {
+directive_module.directive('apolloconfirmdialog', function ($compile, $window, $sce) {
     return {
         restrict: 'E',
         templateUrl: '../../views/component/confirm-dialog.html',
@@ -226,15 +225,26 @@ directive_module.directive('apolloconfirmdialog', function ($compile, $window) {
             detail: '=apolloDetail',
             showCancelBtn: '=apolloShowCancelBtn',
             doConfirm: '=apolloConfirm',
-            cancel:'='
+            confirmBtnText: '=?',
+            cancel: '='
         },
         link: function (scope, element, attrs) {
 
+            scope.$watch("detail", function () {
+                scope.detailAsHtml = $sce.trustAsHtml(scope.detail);
+            });
+
+            if (!scope.confirmBtnText) {
+                scope.confirmBtnText = '确认';
+            }
+            
             scope.confirm = function () {
                 if (scope.doConfirm) {
                     scope.doConfirm();
                 }
-            }
+            };
+            
+
 
         }
     }
@@ -265,6 +275,58 @@ directive_module.directive('apollouserselector', function ($compile, $window) {
         transclude: true,
         replace: true,
         scope: {
+            id: '=apolloId',
+            disabled: '='
+        },
+        link: function (scope, element, attrs) {
+
+            scope.$watch("id", initSelect2);
+
+            var select2Options = {
+                ajax: {
+                    url: '/users',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return {
+                            keyword: params.term ? params.term : '',
+                            limit: 100
+                        }
+                    },
+                    processResults: function (data, params) {
+                        var users = [];
+                        data.forEach(function (user) {
+                            users.push({
+                                           id: user.userId,
+                                           text: user.userId + " | " + user.name
+                                       })
+                        });
+                        return {
+                            results: users
+                        }
+
+                    },
+                    cache: true,
+                    minimumInputLength: 5
+                }
+            };
+
+            function initSelect2() {
+                $('.' + scope.id).select2(select2Options);
+            }
+            
+
+        }
+    }
+});
+
+directive_module.directive('apollomultipleuserselector', function ($compile, $window) {
+    return {
+        restrict: 'E',
+        templateUrl: '../../views/component/multiple-user-selector.html',
+        transclude: true,
+        replace: true,
+        scope: {
             id: '=apolloId'
         },
         link: function (scope, element, attrs) {
@@ -287,7 +349,7 @@ directive_module.directive('apollouserselector', function ($compile, $window) {
                         data.forEach(function (user) {
                             users.push({
                                            id: user.userId,
-                                           text: user.userId + " | " + user.name + " | " + user.email
+                                           text: user.userId + " | " + user.name
                                        })
                         });
                         return {
@@ -303,7 +365,6 @@ directive_module.directive('apollouserselector', function ($compile, $window) {
             function initSelect2() {
                 $('.' + scope.id).select2(searchUsersAjax);
             }
-
         }
     }
 });

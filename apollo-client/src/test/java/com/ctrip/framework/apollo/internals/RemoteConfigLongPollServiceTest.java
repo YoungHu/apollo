@@ -58,6 +58,7 @@ public class RemoteConfigLongPollServiceTest extends ComponentTestCase {
 
   @Before
   public void setUp() throws Exception {
+    super.tearDown();//clear the container
     super.setUp();
 
     defineComponent(ConfigUtil.class, MockConfigUtil.class);
@@ -224,7 +225,7 @@ public class RemoteConfigLongPollServiceTest extends ComponentTestCase {
     remoteConfigLongPollService.submit(anotherNamespace, anotherRepository);
     submitAnotherNamespaceFinish.set(true);
 
-    onAnotherRepositoryNotified.get(500, TimeUnit.MILLISECONDS);
+    onAnotherRepositoryNotified.get(5000, TimeUnit.MILLISECONDS);
 
     remoteConfigLongPollService.stopLongPollingRefresh();
 
