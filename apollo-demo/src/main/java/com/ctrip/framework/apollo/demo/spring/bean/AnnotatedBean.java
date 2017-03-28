@@ -46,11 +46,8 @@ public class AnnotatedBean {
   @ApolloConfigChangeListener("application")
   private void someChangeHandler(ConfigChangeEvent changeEvent) {
     logger.info("[someChangeHandler]Changes for namespace {}", changeEvent.getNamespace());
-    for (String key : changeEvent.changedKeys()) {
-      ConfigChange change = changeEvent.getChange(key);
-      logger.info("[someChangeHandler]Change - key: {}, oldValue: {}, newValue: {}, changeType: {}",
-          change.getPropertyName(), change.getOldValue(), change.getNewValue(),
-          change.getChangeType());
+    if (changeEvent.isChanged("timeout")) {
+      refreshTimeout();
     }
   }
 
@@ -63,5 +60,11 @@ public class AnnotatedBean {
           change.getPropertyName(), change.getOldValue(), change.getNewValue(),
           change.getChangeType());
     }
+  }
+
+  private void refreshTimeout() {
+    //do some custom logic to update placeholder value
+    timeout = config.getIntProperty("timeout", timeout);
+    logger.info("Refreshing timeout to {}", timeout);
   }
 }
